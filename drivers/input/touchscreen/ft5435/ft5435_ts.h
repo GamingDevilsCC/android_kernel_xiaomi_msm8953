@@ -61,9 +61,4 @@ struct ft5435_ts_platform_data {
 	int num_virkey;
 	struct virkey vkeys[FOCALTECH_MAX_VKEY_NUM];
 };
-
-#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
-extern bool gesture_incall;
-#endif
-
 #endif
