@@ -56,11 +56,9 @@ MODULE_LICENSE("GPLv2");
 #define DT2W_DEBUG		0
 #define DT2W_DEFAULT		0
 
-#define DT2W_PWRKEY_DUR		30
+#define DT2W_PWRKEY_DUR		60
 #define DT2W_FEATHER		200
-#define DT2W_TIME		500
-
-#define max_y			1800
+#define DT2W_TIME		700
 
 /* Resources */
 int dt2w_switch = DT2W_DEFAULT;
@@ -103,10 +101,10 @@ static void doubletap2wake_reset(void) {
 static void doubletap2wake_presspwr(struct work_struct * doubletap2wake_presspwr_work) {
 	if (!mutex_trylock(&pwrkeyworklock))
                 return;
-	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_WAKEUP, 1);
+	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_POWER, 1);
 	input_event(doubletap2wake_pwrdev, EV_SYN, 0, 0);
 	msleep(DT2W_PWRKEY_DUR);
-	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_WAKEUP, 0);
+	input_event(doubletap2wake_pwrdev, EV_KEY, KEY_POWER, 0);
 	input_event(doubletap2wake_pwrdev, EV_SYN, 0, 0);
 	msleep(DT2W_PWRKEY_DUR);
         mutex_unlock(&pwrkeyworklock);
@@ -156,15 +154,9 @@ static void detect_doubletap2wake(int x, int y, bool st)
 			if ((calc_feather(x, x_pre) < DT2W_FEATHER) &&
 			    (calc_feather(y, y_pre) < DT2W_FEATHER)) {
 				pr_info(LOGTAG"ON\n");
-				if (y_pre <= max_y) {
-					pr_info(LOGTAG"ON\n");
-					exec_count = false;
-					doubletap2wake_pwrtrigger();
-					doubletap2wake_reset();
-				} else {
-					doubletap2wake_reset();
-					new_touch(x, y);
-				}
+				exec_count = false;
+				doubletap2wake_pwrtrigger();
+				doubletap2wake_reset();
 			} else {
 				doubletap2wake_reset();
 				new_touch(x, y);
@@ -350,7 +342,7 @@ static int __init doubletap2wake_init(void)
 		goto err_alloc_dev;
 	}
 
-	input_set_capability(doubletap2wake_pwrdev, EV_KEY, KEY_WAKEUP);
+	input_set_capability(doubletap2wake_pwrdev, EV_KEY, KEY_POWER);
 	doubletap2wake_pwrdev->name = "dt2w_pwrkey";
 	doubletap2wake_pwrdev->phys = "dt2w_pwrkey/input0";
 
