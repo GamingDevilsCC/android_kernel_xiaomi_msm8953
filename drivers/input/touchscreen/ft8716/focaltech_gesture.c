@@ -128,7 +128,7 @@ static struct attribute_group fts_gesture_group = {
 * Return:
 ***********************************************************************/
 #if FTS_GESTURE_EN
-	int  ft8716_gesture_func_on = 0;
+	int  ft8716_gesture_func_on = 1;
 #endif
 
 static ssize_t fts_gesture_show(struct device *dev, struct device_attribute *attr, char *buf)
