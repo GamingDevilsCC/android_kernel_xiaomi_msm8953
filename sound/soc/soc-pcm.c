@@ -1715,8 +1715,10 @@ int dpcm_be_dai_shutdown(struct snd_soc_pcm_runtime *fe, int stream)
 			continue;
 
 		if ((be->dpcm[stream].state != SND_SOC_DPCM_STATE_HW_FREE) &&
-		    (be->dpcm[stream].state != SND_SOC_DPCM_STATE_OPEN))
-			continue;
+		    (be->dpcm[stream].state != SND_SOC_DPCM_STATE_OPEN)) {
+			soc_pcm_hw_free(be_substream);
+			be->dpcm[stream].state = SND_SOC_DPCM_STATE_HW_FREE;
+		}
 
 		dev_dbg(be->dev, "ASoC: close BE %s\n",
 			dpcm->fe->dai_link->name);
@@ -2998,6 +3000,11 @@ int snd_soc_dpcm_can_be_free_stop(struct snd_soc_pcm_runtime *fe,
 			state == SND_SOC_DPCM_STATE_PAUSED ||
 			state == SND_SOC_DPCM_STATE_SUSPEND)
 			return 0;
+		if (dpcm->fe->cpu_dai->playback_active) {
+			dev_info(dpcm->fe->dev, "ASoc: playback_active %d, cpu_dai->name %s\n",
+				dpcm->fe->cpu_dai->playback_active, dpcm->fe->cpu_dai->name);
+			return 0;
+		}
 	}
 
 	/* it's safe to free/stop this BE DAI */
